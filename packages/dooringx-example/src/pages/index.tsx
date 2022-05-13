@@ -14,16 +14,25 @@ import {
 	ContainerWrapper,
 	Control,
 } from 'dooringx-lib';
-import { InsertRowBelowOutlined, UploadOutlined } from '@ant-design/icons';
+import {
+	DownloadOutlined,
+	ImportOutlined,
+	InsertRowBelowOutlined,
+	RedoOutlined,
+	UndoOutlined,
+	UploadOutlined,
+} from '@ant-design/icons';
 import { useContext, useEffect, useState } from 'react';
 import { configContext, LocaleContext } from '@/layouts';
 import { useCallback } from 'react';
 import { PREVIEWSTATE } from '@/constant';
-import { Button, Input, message, Modal, Popover, Upload } from 'antd';
+import { Button, Divider, Input, message, Modal, Popover, Space, Tooltip, Upload } from 'antd';
 import { localeKey } from '../../../dooringx-lib/dist/locale';
 import { LeftRegistComponentMapItem } from 'dooringx-lib/dist/core/crossDrag';
+import styles from './index.less';
 
-export const HeaderHeight = '40px';
+export const HeaderHeight = '60px';
+
 const footerConfig = function () {
 	return (
 		<>
@@ -64,61 +73,100 @@ export default function IndexPage() {
 
 	return (
 		<div {...innerContainerDragUp(config)}>
-			<div style={{ height: HeaderHeight }}>
-				<Button
-					onClick={() => {
-						window.open('/iframe');
-					}}
-				>
-					iframe 预览
-				</Button>
-				<Button
-					onClick={() => {
-						window.open('/preview');
-					}}
-				>
-					普通预览
-				</Button>
-				<Button
-					onClick={() => {
-						locale.change((pre: localeKey) => {
-							return pre === 'zh-CN' ? 'en' : 'zh-CN';
-						});
-					}}
-				>
-					切换语言
-				</Button>
-				<Input
-					style={{ width: 200 }}
-					value={value}
-					onChange={(e) => setValue(e.target.value)}
-				></Input>
-				<Button
-					onClick={() => {
-						const leftprops: Partial<LeftRegistComponentMapItem> = {
-							type: 'basic',
-							img: 'https://img.guguzhu.com/d/file/android/ico/2021/09/08/rytzi2w34tm.png',
-						};
-						config.scriptSingleLoad(value, leftprops);
-					}}
-				>
-					远程组件
-				</Button>
-				<Button
-					onClick={() => {
-						createAndDownloadFile('dooring.json');
-					}}
-				>
-					下载json
-				</Button>
-				<Button
-					onClick={() => {
-						setOpen(true);
-					}}
-				>
-					上传json
-				</Button>
-			</div>
+			<header className={styles.headerRender} style={{ height: HeaderHeight }}>
+				<div className={styles.left} />
+				<div className={styles.content}>
+					<Space>
+						<Divider type="vertical" />
+						{/* <Button
+						type="primary"
+						onClick={() => {
+							window.open('/iframe');
+						}}
+					>
+						iframe 预览
+					</Button> */}
+						<Tooltip placement="bottom" title="撤销">
+							<Button
+								type="text"
+								icon={<UndoOutlined />}
+								onClick={() => {
+									config.getStore().undo();
+								}}
+							></Button>
+						</Tooltip>
+						<Tooltip placement="bottom" title="重做">
+							<Button
+								type="text"
+								icon={<RedoOutlined />}
+								onClick={() => {
+									config.getStore().redo();
+								}}
+							></Button>
+						</Tooltip>
+						<Tooltip placement="bottom" title="导入JSON">
+							<Button
+								type="text"
+								icon={<ImportOutlined />}
+								onClick={() => {
+									setOpen(true);
+								}}
+							></Button>
+						</Tooltip>
+						<Tooltip placement="bottom" title="导出JSON">
+							<Button
+								type="text"
+								icon={<DownloadOutlined />}
+								onClick={() => {
+									createAndDownloadFile('dooring.json');
+								}}
+							></Button>
+						</Tooltip>
+						<Divider type="vertical" />
+						<Button
+							type="text"
+							onClick={() => {
+								window.open('/preview');
+							}}
+						>
+							预览
+						</Button>
+						{/* <Input.Group compact>
+						<Input
+							type="primary"
+							size="small"
+							style={{ width: 200 }}
+							value={value}
+							onChange={(e) => setValue(e.target.value)}
+						></Input>
+						<Button
+							type="primary"
+							size="small"
+							onClick={() => {
+								const leftprops: Partial<LeftRegistComponentMapItem> = {
+									type: 'basic',
+									img: 'https://img.guguzhu.com/d/file/android/ico/2021/09/08/rytzi2w34tm.png',
+								};
+								config.scriptSingleLoad(value, leftprops);
+							}}
+						>
+							远程组件
+						</Button>
+					</Input.Group> */}
+					</Space>
+				</div>
+				<div className={styles.right}>
+					<Button
+						onClick={() => {
+							locale.change((pre: localeKey) => {
+								return pre === 'zh-CN' ? 'en' : 'zh-CN';
+							});
+						}}
+					>
+						{locale.current === 'zh-CN' ? 'English' : '中文'}
+					</Button>
+				</div>
+			</header>
 			<Modal
 				visible={open}
 				onCancel={() => setOpen(false)}
